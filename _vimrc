@@ -1,4 +1,8 @@
 source $VIMRUNTIME/vimrc_example.vim
+let mapleader=","
+
+set exrc
+set secure
 
 set nobackup
 set nowritebackup
@@ -37,43 +41,34 @@ function MyDiff()
   endif
 endfunction
 
-function! LF()
-	let temp = tempname()
-	exec 'silent !lf -selection-path='.shellescape(temp)
-	if !filereadable(temp)
-		redraw!
-		return
-	endif
-	let names = readfile(temp)
-	if empty(names)
-		redraw!
-		return
-	endif
-	exec 'edit ' . fnameescape(name)
-	for name in names[1:]
-		exec 'argadd ' . fnameescape(name)
-	endfor
-	redraw!
-endfunction
-command! -bar LF call LF()
-
 " vim plugins
+
 call plug#begin('~/.vim/plugged')
 
 Plug 'plasticboy/vim-markdown'
 Plug 'reedes/vim-pencil'
+Plug 'junegunn/goyo.vim'
+Plug 'vim-pandoc/vim-pandoc'
+Plug 'vim-pandoc/vim-pandoc-syntax'
 
 call plug#end()
 
 " Luke Smith's guide navigation
-inoremap <Space><Space> <Esc>/<++><Enter>"_c4l
-vnoremap <Space><Space> <Esc>/<++><Enter>"_c4l
-map <Space><Space> <Esc>/<++><Enter>"_c4l
+inoremap <leader><leader> <Esc>/<++><Enter>"_c4l
+vnoremap <leader><leader> <Esc>/<++><Enter>"_c4l
+map <leader><leader> <Esc>/<++><Enter>"_c4l
 
 " Markdown macros
-autocmd Filetype markdown,rmd inoremap ,m $$<Enter><Enter>$$<Enter><Enter><++><Esc>kkkA
+let g:vim_markdown_folding_disabled = 1
+let g:goyo_width = 120
+let g:vim_markdown_frontmatter = 1
+autocmd BufRead,BufNewFile *.md :SoftPencil
+autocmd BufRead,BufNewFile *.md :Goyo
+autocmd Filetype markdown,rmd inoremap ,m <Enter>$$<Enter><Enter>$$<Enter><Enter><++><Esc>kkkA
 autocmd Filetype markdown,rmd inoremap ,n ---<Enter><Enter>
 autocmd Filetype markdown,rmd inoremap ,b ****<++><Esc>F*hi
 autocmd Filetype markdown,rmd inoremap ,s ~~~~<++><Esc>F~hi
 autocmd Filetype markdown,rmd inoremap ,e **<++><Esc>F*i
 autocmd Filetype markdown,rmd inoremap ,g {}{<++>} <++><Esc>11hci{
+autocmd Filetype markdown,rmd inoremap ,$ $$ <++><Esc>5hi
+autocmd Filetype markdown,rmd inoremap ,i ![](<++>) <++><Esc>11hi
